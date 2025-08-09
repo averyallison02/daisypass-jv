@@ -10,8 +10,10 @@ package com.averyallison.daisypass;
  *  <li><code>username</code> - (optional) the username or e-mail associated with this password</li>
  *  <li><code>notes</code> - (optional) additional data associated with this password</li>
  * </ul>
+ * @author Avery Allison <averymallison@proton.me>
+ * @version 0.1.0
+ * @since 0.1.0
  */
-
 public class Password 
 {
     private byte[] encryptedPassword;
