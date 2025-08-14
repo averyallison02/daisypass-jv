@@ -1,1 +1,3 @@
-/home/avery/projects/daisypass-jv/daisypass/src/main/java/com/averyallison/daisypass/App.java
+/home/avery/projects/daisypass-jv/daisypass/src/main/java/com/averyallison/daisypass/crypto/MasterKeyDeriver.java
+/home/avery/projects/daisypass-jv/daisypass/src/main/java/com/averyallison/daisypass/Main.java
+/home/avery/projects/daisypass-jv/daisypass/src/main/java/com/averyallison/daisypass/Password.java

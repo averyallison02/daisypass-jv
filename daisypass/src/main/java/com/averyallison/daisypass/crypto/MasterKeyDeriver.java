@@ -1,8 +1,9 @@
 package com.averyallison.daisypass.crypto;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.security.SecureRandom;
+
 import java.util.Base64;
 
 import javax.crypto.SecretKeyFactory;
@@ -32,7 +33,28 @@ public class MasterKeyDeriver
     public static final int ITERATION_COUNT = 100_000;
     public static final int KEY_LENGTH = 256;
 
-    private final String DERIVER_ALGORITHM = "PBKDF2WithHmacSHA256";
+    public static final String DERIVER_ALGORITHM = "PBKDF2WithHmacSHA256";
+
+    /**
+     * Initialize the key deriver with a stored salt
+     * @param masterPassword a 12-20 character user-entered string
+     * @param saltB64 a salt pulled from persistent storage
+     */
+    public MasterKeyDeriver(String masterPassword, String saltB64)
+    {
+        this.masterPassword = masterPassword;
+        this.saltB64 = saltB64;
+    }
+
+    /**
+     * Initialize the key deriver with a generated salt
+     * @param masterPassword a 12-20 character user-entered string
+     */
+    public MasterKeyDeriver(String masterPassword)
+    {
+        this.masterPassword = masterPassword;
+        this.saltB64 = generateSalt();
+    }
 
     public String getMasterPassword()
     {
@@ -42,34 +64,33 @@ public class MasterKeyDeriver
     /**
      * ensures the following about an entered master password:
      * <ul>
-     *  <li>It contains between twelve and twenty characters</li>
-     *  <li>It contains at least one number (0-9)</li>
-     *  <li>It contains at least one character that is not a letter or number</li>
-     *  <li>It does not contain whitespace or emojis</li>
+     *  <li>it contains between twelve and twenty characters</li>
+     *  <li>it contains at least one letter</li>
+     *  <li>it contains at least one number (0-9)</li>
+     *  <li>it contains at least one special character from the set of:
+     *      <code>! @ # $ % ^ & * ( ) _ + - = [ ] { } | ; : , . &lt; &gt; ? /</code>
+     *  </li>
+     *  <li>it does not contain whitespace or emojis</li>
      * </ul>
      * @param masterPassword The password to be validated
-     * @return The validity of the password
+     * @return true if the password meets all criteria, false otherwise.
      */
     private boolean validateMasterPassword(String masterPassword)
     {
-        if (20 < masterPassword.length() || masterPassword.length() < 12) return false;
+        final int MAX_LENGTH = 20;
+        final int MIN_LENGTH = 12;
 
-        boolean containsDigit = false;
-        boolean containsSpecial = false;
-        for (int i = 0; i < masterPassword.length(); i++) 
-        {
-            char c = masterPassword.charAt(i);
-            if (Character.isWhitespace(c)) return false;
-            if (Character.isEmoji(c)) return false;
+        if (MAX_LENGTH < masterPassword.length() || masterPassword.length() < MIN_LENGTH) return false;
 
-            if (Character.isDigit(c)) containsDigit = true;
-            if (!(Character.isLetterOrDigit(c))) containsSpecial = true;
-        }
+        final String PATTERN_LETTERS = ".*[A-Za-z].*";
+        final String PATTERN_DIGITS = ".*[0-9].*";
+        final String PATTERN_SPECIALS = ".*[!@#$%^&*()_+\\-=\\[\\]{}|;:,.<>?/].*";
+        final String PATTERN_ALLOWED = "^[A-Za-z0-9!@#$%^&*()_+\\-=\\[\\]{}|;:,.<>?/]+$";
 
-        if (!containsDigit) return false;
-        if (!containsSpecial) return false;
-
-        return true;
+        return masterPassword.matches(PATTERN_LETTERS) &&
+            masterPassword.matches(PATTERN_DIGITS) &&
+            masterPassword.matches(PATTERN_SPECIALS) &&
+            masterPassword.matches(PATTERN_ALLOWED);
     }
 
     public boolean setMasterPassword(String masterPassword)
