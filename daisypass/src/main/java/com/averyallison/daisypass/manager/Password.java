@@ -1,4 +1,4 @@
-package com.averyallison.daisypass;
+package com.averyallison.daisypass.manager;
 
 /**
  * Stores data for a password entry
@@ -16,32 +16,32 @@ package com.averyallison.daisypass;
  */
 public class Password 
 {
-    private byte[] encryptedPassword;
-    private byte[] nonce;
+    private String encryptedPasswordB64;
+    private String nonceB64;
 
     private String nickname;
     private String url;
     private String username;
     private String notes;
 
-    public byte[] getEncryptedPassword()
+    public String getEncryptedPasswordB64()
     {
-        return this.encryptedPassword.clone();
+        return this.encryptedPasswordB64;
     }
 
-    public void setEncryptedPassword(byte[] encryptedPassword)
+    public void setEncryptedPasswordB64(String encryptedPasswordB64)
     {
-        this.encryptedPassword = encryptedPassword.clone();
+        this.encryptedPasswordB64 = encryptedPasswordB64;
     }
 
-    public byte[] getNonce()
+    public String getNonceB64()
     {
-        return this.nonce.clone();
+        return this.nonceB64;
     }
 
-    public void setNonce(byte[] nonce)
+    public void setNonceB64(String nonceB64)
     {
-        this.nonce = nonce.clone();
+        this.nonceB64 = nonceB64;
     }
 
     public String getNickname()
