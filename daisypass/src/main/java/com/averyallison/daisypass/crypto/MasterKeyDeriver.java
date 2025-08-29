@@ -20,6 +20,7 @@ import javax.crypto.spec.PBEKeySpec;
  *  <li><code>ITERATION_COUNT</code> - number of times to run password and salt through the algorithm</li>
  *  <li><code>KEYLENGTH</code> - length of the derived key in bytes</li>
  *  <li><code>DERIVER_ALGORITHM</code> - algorithm for the key deriver to use</li>
+ *  <li><code>KEY_ALGORITHM</code> - algorithm for converting the PBEKey</li>
  * </ul>
  * @author Avery Allison <averymallison@proton.me>
  * @version 0.1.0

@@ -3,11 +3,11 @@ package com.averyallison.daisypass.crypto;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-import com.averyallison.daisypass.manager.Password.EncryptedPasswordData;
+import java.util.Arrays;
+
+import com.averyallison.daisypass.manager.PasswordEntry.EncryptedPasswordData;
 
 import java.security.GeneralSecurityException;
-
-import javax.crypto.SecretKey;
 
 public class PasswordCipherTest 
 {
@@ -25,11 +25,27 @@ public class PasswordCipherTest
     }
 
     @Test
-    public void encryptPasswordTest() throws GeneralSecurityException
+    public void encryptPasswordDuplicateTest() throws GeneralSecurityException
     {
         MasterKeyDeriver testDeriver = new MasterKeyDeriver("abcde123456@");
         PasswordCipher testCipher = new PasswordCipher(testDeriver.deriveKey());
 
         EncryptedPasswordData encryptedPasswordData = testCipher.encryptPassword("TestPassword");
+        EncryptedPasswordData duplicateEncryptedPasswordData = testCipher.encryptPassword("TestPassword");
+
+        assertFalse(Arrays.equals(encryptedPasswordData.getEncryptedPassword(), duplicateEncryptedPasswordData.getEncryptedPassword()));
+        assertFalse(Arrays.equals(encryptedPasswordData.getIV(), duplicateEncryptedPasswordData.getIV()));
+    }
+
+    @Test
+    public void encryptDecryptPasswordTest() throws GeneralSecurityException
+    {
+        MasterKeyDeriver testDeriver = new MasterKeyDeriver("abcde123456@");
+        PasswordCipher testCipher = new PasswordCipher(testDeriver.deriveKey());
+
+        String testPassword = "TestPassword";
+        EncryptedPasswordData testPasswordEncrypted = testCipher.encryptPassword(testPassword);
+
+        assertEquals(testCipher.decryptPassword(testPasswordEncrypted), testPassword);
     }
 }

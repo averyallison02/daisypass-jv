@@ -11,7 +11,7 @@
     <property name="java.vm.specification.version" value="21"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk-amd64/lib"/>
-    <property name="sun.java.command" value="/home/avery/projects/daisypass-jv/daisypass/target/surefire/surefirebooter2539996452975490322.jar /home/avery/projects/daisypass-jv/daisypass/target/surefire 2025-08-29T12-11-02_003-jvmRun1 surefire16051725604792927229tmp surefire_05088313118017607844tmp"/>
+    <property name="sun.java.command" value="/home/avery/projects/daisypass-jv/daisypass/target/surefire/surefirebooter13615989983570488432.jar /home/avery/projects/daisypass-jv/daisypass/target/surefire 2025-08-29T16-40-56_700-jvmRun1 surefire15984080842874312137tmp surefire_07809415866957189176tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/home/avery/projects/daisypass-jv/daisypass/target/test-classes:/home/avery/projects/daisypass-jv/daisypass/target/classes:/home/avery/.m2/repository/junit/junit/4.11/junit-4.11.jar:/home/avery/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -26,7 +26,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="/home/avery/projects/daisypass-jv/daisypass/target/surefire/surefirebooter2539996452975490322.jar"/>
+    <property name="surefire.real.class.path" value="/home/avery/projects/daisypass-jv/daisypass/target/surefire/surefirebooter13615989983570488432.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.8+9-Ubuntu-0ubuntu124.04.1"/>
     <property name="user.name" value="avery"/>

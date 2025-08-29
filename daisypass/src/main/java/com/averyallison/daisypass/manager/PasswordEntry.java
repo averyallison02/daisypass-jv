@@ -1,5 +1,7 @@
 package com.averyallison.daisypass.manager;
 
+import java.util.Arrays;
+
 import java.util.Base64;
 
 /**
@@ -15,7 +17,7 @@ import java.util.Base64;
  * @version 0.1.0
  * @since 0.1.0
  */
-public class Password 
+public class PasswordEntry 
 {
     /**
      * Stores encrypted data of a password entry
@@ -24,7 +26,7 @@ public class Password
      *  <li><code>iv</code> - a public iv for decrypting a password</li>
      * </ul>
      */
-    public static class EncryptedPasswordData implements Cloneable
+    public static final class EncryptedPasswordData implements Cloneable
     {
         private byte[] encryptedPassword;
         private byte[] iv;
@@ -80,6 +82,21 @@ public class Password
         {
             return new EncryptedPasswordData(this.encryptedPassword, this.iv);
         }
+
+        @Override
+        public final int hashCode()
+        {
+            return this.encryptedPassword.hashCode() + this.iv.hashCode();
+        }
+
+        @Override
+        public final boolean equals(Object other)
+        {
+            if (!(other instanceof EncryptedPasswordData)) return false;
+
+            EncryptedPasswordData otherPasswordData = (EncryptedPasswordData) other;
+            return Arrays.equals(this.encryptedPassword, otherPasswordData.encryptedPassword) && Arrays.equals(this.iv, otherPasswordData.iv);
+        }
     }
 
     private EncryptedPasswordData encryptedPasswordData;
@@ -89,7 +106,7 @@ public class Password
     private String username;
     private String notes;
 
-    public Password(EncryptedPasswordData encryptedPasswordData)
+    public PasswordEntry(EncryptedPasswordData encryptedPasswordData)
     {
         setEncryptedPasswordData(encryptedPasswordData);        
     }

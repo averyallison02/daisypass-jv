@@ -8,7 +8,7 @@ import javax.crypto.SecretKey;
 
 import javax.crypto.spec.IvParameterSpec;
 
-import com.averyallison.daisypass.manager.Password.EncryptedPasswordData;
+import com.averyallison.daisypass.manager.PasswordEntry.EncryptedPasswordData;
 
 /**
  * Utility for encrypting and decrypting passwords
