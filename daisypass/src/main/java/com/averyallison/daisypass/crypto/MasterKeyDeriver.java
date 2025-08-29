@@ -8,13 +8,14 @@ import java.util.Base64;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.crypto.spec.PBEKeySpec;
 
 /**
  * Derives a key from a user-entered Master Password
  * <ul>
  *  <li><code>masterPassword</code> - A plaintext master password received at runtime from the user</li>
- *  <li><code>saltB64</code> - A Base64-encoded salt to make the password unique<li>
+ *  <li><code>salt</code> - A salt to make the password unique<li>
  *  <li><code>DEFAULT_SALT_LENGTH</code> - default length for the public salt in bytes</li>
  *  <li><code>ITERATION_COUNT</code> - number of times to run password and salt through the algorithm</li>
  *  <li><code>KEYLENGTH</code> - length of the derived key in bytes</li>
@@ -27,23 +28,24 @@ import javax.crypto.spec.PBEKeySpec;
 public class MasterKeyDeriver 
 {
     private String masterPassword;
-    private String saltB64;
+    private byte[] salt;
 
-    public static final int DEFAULT_SALT_LENGTH = 16; 
-    public static final int ITERATION_COUNT = 100_000;
-    public static final int KEY_LENGTH = 256;
+    private static final int DEFAULT_SALT_LENGTH = 16; 
+    private static final int ITERATION_COUNT = 100_000;
+    private static final int KEY_LENGTH = 256;
 
-    public static final String DERIVER_ALGORITHM = "PBKDF2WithHmacSHA256";
+    private static final String DERIVER_ALGORITHM = "PBKDF2WithHmacSHA256";
+    private static final String KEY_ALGORITHM = "AES";
 
     /**
      * Initialize the key deriver with a stored salt
      * @param masterPassword a 12-20 character user-entered string
-     * @param saltB64 a salt pulled from persistent storage
+     * @param saltB64 a Base64-encoded salt pulled from persistent storage
      */
     public MasterKeyDeriver(String masterPassword, String saltB64)
     {
-        this.masterPassword = masterPassword;
-        this.saltB64 = saltB64;
+        setMasterPassword(masterPassword);
+        setSaltB64(saltB64);
     }
 
     /**
@@ -52,8 +54,8 @@ public class MasterKeyDeriver
      */
     public MasterKeyDeriver(String masterPassword)
     {
-        this.masterPassword = masterPassword;
-        this.saltB64 = generateSalt();
+        setMasterPassword(masterPassword);
+        setSalt(generateSalt());
     }
 
     public String getMasterPassword()
@@ -106,32 +108,42 @@ public class MasterKeyDeriver
         return true;
     }
 
+    public byte[] getSalt()
+    {
+        return this.salt.clone();
+    }
+
+    public void setSalt(byte[] salt)
+    {
+        this.salt = salt.clone();
+    }
+
     public String getSaltB64()
     {
-        return this.saltB64;
+        return Base64.getEncoder().encodeToString(this.salt);
     }
 
     public void setSaltB64(String saltB64)
     {
-        this.saltB64 = saltB64;
+        this.salt = Base64.getDecoder().decode(saltB64);
     }
 
     /**
-     * generates a Base64 representation of a random salt
+     * generates a byte[] representation of a random salt
      * @param length the length of the decoded salt, in bytes
      * @return the encoded salt
      */
-    public String generateSalt(int length)
+    public byte[] generateSalt(int length)
     {
         SecureRandom salter = new SecureRandom();
         byte[] salt = new byte[length];
 
         salter.nextBytes(salt);
 
-        return Base64.getEncoder().encodeToString(salt);
+        return salt;
     }
 
-    public String generateSalt()
+    public byte[] generateSalt()
     {
         return generateSalt(DEFAULT_SALT_LENGTH);
     }
@@ -146,11 +158,13 @@ public class MasterKeyDeriver
     {
         PBEKeySpec keySpec = new PBEKeySpec(
             this.masterPassword.toCharArray(), 
-            Base64.getDecoder().decode(saltB64), 
+            salt, 
             ITERATION_COUNT, 
             KEY_LENGTH);
         
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(DERIVER_ALGORITHM);
-        return keyFactory.generateSecret(keySpec);
+        byte[] keyBytes = keyFactory.generateSecret(keySpec).getEncoded();
+
+        return new SecretKeySpec(keyBytes, KEY_ALGORITHM);
     }
 }

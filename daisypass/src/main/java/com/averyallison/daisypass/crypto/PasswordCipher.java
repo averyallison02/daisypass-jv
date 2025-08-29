@@ -1,11 +1,14 @@
 package com.averyallison.daisypass.crypto;
 
-import java.util.Base64;
-
 import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+
+import javax.crypto.spec.IvParameterSpec;
+
+import com.averyallison.daisypass.manager.Password.EncryptedPasswordData;
 
 /**
  * Utility for encrypting and decrypting passwords
@@ -21,7 +24,7 @@ public class PasswordCipher
 {
     private SecretKey passwordKey;
 
-    private static final String DEFAULT_TRANSFORMATION = "AES";
+    private static final String DEFAULT_TRANSFORMATION = "AES/CBC/PKCS5Padding";
 
     public PasswordCipher(SecretKey passwordKey)
     {
@@ -40,34 +43,48 @@ public class PasswordCipher
     }
 
     /**
+     * generate a SecureRandom IV spec
+     * @return the generated spec
+     */
+    private IvParameterSpec generateIV()
+    {
+        final int AES_BLOCK_SIZE = 16;
+
+        byte[] iv = new byte[AES_BLOCK_SIZE];
+        SecureRandom secureRandom = new SecureRandom();
+        secureRandom.nextBytes(iv);
+        return new IvParameterSpec(iv);
+    }
+
+    /**
      * takes a password and encrypts with passwordKey
      * @param password a plain-text password
-     * @return a Base64 representation of the encrypted password
+     * @return a byte array containing the encrypted password
      * @throws GeneralSecurityException cipher had issues with transformation or encryption
      */
-    public String encryptPassword(String password) throws GeneralSecurityException 
+    public EncryptedPasswordData encryptPassword(String password) throws GeneralSecurityException 
     {
         Cipher encryptCipher = Cipher.getInstance(DEFAULT_TRANSFORMATION);
-        encryptCipher.init(Cipher.ENCRYPT_MODE, passwordKey);
+        IvParameterSpec ivParam = generateIV();
+        encryptCipher.init(Cipher.ENCRYPT_MODE, passwordKey, ivParam);
 
         byte[] encryptedPassword = encryptCipher.doFinal(password.getBytes());
-        return Base64.getEncoder().encodeToString(encryptedPassword);
+        byte[] iv = ivParam.getIV();
+        return new EncryptedPasswordData(encryptedPassword, iv);
     }
 
     /**
      * takes an encrypted password and decrypts with passwordKey
-     * @param encryptedPasswordB64 an encrypted password encoded in Base64
+     * @param encryptedPasswordData a structure containing an encrypted password and an IV
      * @return a plain-text password
      * @throws GeneralSecurityException cipher had issues with transformation or decryption
      */
-    public String decryptPassword(String encryptedPasswordB64) throws GeneralSecurityException
+    public String decryptPassword(EncryptedPasswordData encryptedPasswordData) throws GeneralSecurityException
     {
-        byte[] encryptedPassword = Base64.getDecoder().decode(encryptedPasswordB64);
-
         Cipher decryptCipher = Cipher.getInstance(DEFAULT_TRANSFORMATION);
-        decryptCipher.init(Cipher.DECRYPT_MODE, passwordKey);
+        decryptCipher.init(Cipher.DECRYPT_MODE, passwordKey, new IvParameterSpec(encryptedPasswordData.getIV()));
 
-        byte[] decryptedPassword = decryptCipher.doFinal(encryptedPassword);
+        byte[] decryptedPassword = decryptCipher.doFinal(encryptedPasswordData.getEncryptedPassword());
         return new String(decryptedPassword);
     }
 }

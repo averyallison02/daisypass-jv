@@ -1,23 +1,30 @@
 package com.averyallison.daisypass.crypto;
 
 import static org.junit.Assert.*;
-
-import java.util.Base64;
-
 import org.junit.Test;
+
+import java.util.Arrays;
+
+import java.security.GeneralSecurityException;
 
 public class MasterKeyDeriverTest 
 {
     @Test
-    public void duplicatePasswordTest()
+    public void duplicatePasswordTest() throws GeneralSecurityException
     {
-       MasterKeyDeriver testDeriver = new MasterKeyDeriver("sdsdvc@$sd34jmd");
-       String testDeriverSalt = testDeriver.getSaltB64();
+        final String DUPLICATE_PASSWORD = "sdsdvc@$sd34jmd";
 
-       MasterKeyDeriver testDeriverSamePass = new MasterKeyDeriver("sdsdvc@$sd34jmd");
-       String testDeriverSamePassSalt = testDeriverSamePass.getSaltB64();
+       MasterKeyDeriver testDeriver = new MasterKeyDeriver(DUPLICATE_PASSWORD);
+       byte[] testDeriverSalt = testDeriver.getSalt();
+
+       MasterKeyDeriver testDeriverSamePass = new MasterKeyDeriver(DUPLICATE_PASSWORD);
+       byte[] testDeriverSamePassSalt = testDeriverSamePass.getSalt();
 
        assertFalse(testDeriverSalt.equals(testDeriverSamePassSalt));
+
+       byte[] passKey = testDeriver.deriveKey().getEncoded();
+       byte[] samePassKey = testDeriverSamePass.deriveKey().getEncoded();
+       assertFalse(Arrays.equals(passKey, samePassKey));
     }
 
     @Test
@@ -25,17 +32,14 @@ public class MasterKeyDeriverTest
     {
         MasterKeyDeriver testDeriver = new MasterKeyDeriver("TestPassword");
 
-       String saltB64 = testDeriver.generateSalt();
-       byte[] salt = Base64.getDecoder().decode(saltB64);
-       assertTrue(salt.length == MasterKeyDeriver.DEFAULT_SALT_LENGTH);
+       byte[] salt = testDeriver.generateSalt();
+       assertTrue(salt.length == 16);
 
-       String oldSaltB64 = saltB64;
-       saltB64 = testDeriver.generateSalt();
-       salt = Base64.getDecoder().decode(saltB64);
-       assertTrue(oldSaltB64 != saltB64);
+       byte[] oldSalt = salt.clone();
+       salt = testDeriver.generateSalt();
+       assertTrue(oldSalt != salt);
 
-       saltB64 = testDeriver.generateSalt(8);
-       salt = Base64.getDecoder().decode(saltB64);
+       salt = testDeriver.generateSalt(8);
        assertTrue(salt.length == 8);
     }
 

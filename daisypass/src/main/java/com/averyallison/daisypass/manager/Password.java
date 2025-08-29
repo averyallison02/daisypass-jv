@@ -1,10 +1,11 @@
 package com.averyallison.daisypass.manager;
 
+import java.util.Base64;
+
 /**
  * Stores data for a password entry
  * <ul>
- *  <li><code>encryptedPassword</code> - a password encrypted by a master key</li>
- *  <li><code>nonce</code> - a public nonce for decrypting a password</li>
+ *  <li><code>encryptedPasswordData</code> - encrypted data associated with this password</li>
  *  <li><code>nickname</code> - a short name used to search for a password</li>
  *  <li><code>url</code> - (optional) the website url associated with this password</li>
  *  <li><code>username</code> - (optional) the username or e-mail associated with this password</li>
@@ -16,32 +17,91 @@ package com.averyallison.daisypass.manager;
  */
 public class Password 
 {
-    private String encryptedPasswordB64;
-    private String nonceB64;
+    /**
+     * Stores encrypted data of a password entry
+     * <ul>
+     *  <li><code>encryptedPassword</code> - a password encrypted by a master key</li>
+     *  <li><code>iv</code> - a public iv for decrypting a password</li>
+     * </ul>
+     */
+    public static class EncryptedPasswordData implements Cloneable
+    {
+        private byte[] encryptedPassword;
+        private byte[] iv;
+
+        public EncryptedPasswordData(byte[] encryptedPassword, byte[] iv)
+        {
+            setEncryptedPassword(encryptedPassword);
+            setIV(iv);
+        }
+
+        public byte[] getEncryptedPassword()
+        {
+            return this.encryptedPassword.clone();
+        }
+            
+        public void setEncryptedPassword(byte[] encryptedPassword)
+        {
+            this.encryptedPassword = encryptedPassword.clone();
+        }
+
+        public String getEncryptedPasswordB64()
+        {
+            return Base64.getEncoder().encodeToString(this.encryptedPassword);
+        }
+
+        public void setEncryptedPasswordB64(String encryptedPasswordB64)
+        {
+            this.encryptedPassword = Base64.getDecoder().decode(encryptedPasswordB64);
+        }
+
+        public byte[] getIV()
+        {
+           return this.iv.clone();
+        }
+
+        public void setIV(byte[] iv)
+        {
+            this.iv = iv.clone();
+        }
+
+        public String getIVB64()
+        {
+            return Base64.getEncoder().encodeToString(this.iv);
+        }
+
+        public void setIVB64(String ivB64)
+        {
+            this.iv = Base64.getDecoder().decode(ivB64);
+        }
+
+        @Override
+        public EncryptedPasswordData clone()
+        {
+            return new EncryptedPasswordData(this.encryptedPassword, this.iv);
+        }
+    }
+
+    private EncryptedPasswordData encryptedPasswordData;
 
     private String nickname;
     private String url;
     private String username;
     private String notes;
 
-    public String getEncryptedPasswordB64()
+    public Password(EncryptedPasswordData encryptedPasswordData)
     {
-        return this.encryptedPasswordB64;
+        setEncryptedPasswordData(encryptedPasswordData);        
     }
 
-    public void setEncryptedPasswordB64(String encryptedPasswordB64)
+    public EncryptedPasswordData getEncryptedPasswordData()
     {
-        this.encryptedPasswordB64 = encryptedPasswordB64;
+        return this.encryptedPasswordData.clone();
     }
 
-    public String getNonceB64()
+    public void setEncryptedPasswordData(EncryptedPasswordData encryptedPasswordData)
     {
-        return this.nonceB64;
-    }
-
-    public void setNonceB64(String nonceB64)
-    {
-        this.nonceB64 = nonceB64;
+        this.encryptedPasswordData = encryptedPasswordData.clone();
     }
 
     public String getNickname()
