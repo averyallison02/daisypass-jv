@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribtion: 'temurin'
+          distribution: 'temurin'
           architecture: 'x64'
           cache: maven
       - name: Test with Maven
